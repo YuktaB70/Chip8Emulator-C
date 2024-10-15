@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
+
 #include "chip8.h"
 
 
@@ -25,9 +27,30 @@ void init() {
         chip8.memory[i] = 0;
     }
 
-    chip8.PC = 0x200;
     chip8.AP = 0x0;
+    chip8.PC = 0x200;
     chip8.SP = 0;
     chip8.delay_timer = 0;
     chip8.sounds_timer = 0;
 };
+
+void loadProgram(const char *filename) {
+   FILE *file = fopen(filename, "rb");
+
+
+    if (file == NULL) {
+        printf("file can't be opened \n");
+    }    
+    int offset = 0;
+    while (offset < (4096 - 0x200)) {
+        int byte = fgetc(file);
+        if (byte == EOF) {
+            break; // End of file reached
+        }
+        chip8.memory[0x200 + offset] = (unsigned char)(byte & 0xFF);
+        offset++;
+    }
+    printf("working");
+
+    fclose(file);
+}
